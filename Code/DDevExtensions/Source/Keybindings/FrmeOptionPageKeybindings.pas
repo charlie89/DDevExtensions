@@ -28,6 +28,7 @@ type
     FExtendedHome: Boolean;
     FSwitchedExtendedHome: Boolean;
     FExtendedCtrlLeftRight: Boolean;
+    FExtendedCtrlLeftRightStopAtSpace: Boolean;
     {$IF CompilerVersion <= 20.0}
     FShiftF3: Boolean;
     {$IFEND}
@@ -66,6 +67,7 @@ type
     property ExtendedHome: Boolean read FExtendedHome write FExtendedHome;
     property SwitchedExtendedHome: Boolean read FSwitchedExtendedHome write FSwitchedExtendedHome;
     property ExtendedCtrlLeftRight: Boolean read FExtendedCtrlLeftRight write FExtendedCtrlLeftRight;
+    property ExtendedCtrlLeftRightStopAtSpace: Boolean read FExtendedCtrlLeftRightStopAtSpace write FExtendedCtrlLeftRightStopAtSpace;
     {$IF CompilerVersion <= 20.0}
     property ShiftF3: Boolean read FShiftF3 write FShiftF3;
     {$IFEND}
@@ -83,9 +85,11 @@ type
     cbxShiftF3: TCheckBox;
     chkMoveLineBlock: TCheckBox;
     chkFindDeclOnCaret: TCheckBox;
+    cbxExtendedCtrlLeftRightStopAtSpace: TCheckBox;
     procedure cbxActiveClick(Sender: TObject);
     procedure cbxExtendedHomeClick(Sender: TObject);
     procedure cbxTabIndentClick(Sender: TObject);
+    procedure cbxExtendedCtrlLeftRightClick(Sender: TObject);
   private
     { Private-Deklarationen }
     FKeyBindings: TKeybindings;
@@ -163,7 +167,14 @@ begin
   cbxTabIndentClick(cbxTabIndent);
   cbxExtendedHome.Enabled := cbxActive.Checked;
   cbxExtendedCtrlLeftRight.Enabled := cbxActive.Checked;
+  cbxExtendedCtrlLeftRightClick(cbxExtendedCtrlLeftRight);
   cbxExtendedHomeClick(cbxExtendedHome);
+end;
+
+procedure TFrameOptionPageKeybindings.cbxExtendedCtrlLeftRightClick(
+  Sender: TObject);
+begin
+  cbxExtendedCtrlLeftRightStopAtSpace.Enabled := cbxExtendedCtrlLeftRight.Enabled and cbxExtendedCtrlLeftRight.Checked;
 end;
 
 procedure TFrameOptionPageKeybindings.cbxExtendedHomeClick(Sender: TObject);
@@ -173,7 +184,7 @@ end;
 
 procedure TFrameOptionPageKeybindings.cbxTabIndentClick(Sender: TObject);
 begin
-  cbxIndentSingleLine.Enabled := cbxTabIndent.Enabled;
+  cbxIndentSingleLine.Enabled := cbxTabIndent.Enabled and cbxTabIndent.Checked;
 end;
 
 procedure TFrameOptionPageKeybindings.LoadData;
@@ -184,6 +195,7 @@ begin
   cbxExtendedHome.Checked := FKeyBindings.ExtendedHome;
   cbxSwitchExtendedHome.Checked := FKeyBindings.SwitchedExtendedHome;
   cbxExtendedCtrlLeftRight.Checked := FKeyBindings.ExtendedCtrlLeftRight;
+  cbxExtendedCtrlLeftRightStopAtSpace.Checked := FKeyBindings.ExtendedCtrlLeftRightStopAtSpace;
   {$IF CompilerVersion <= 20.0}
   cbxShiftF3.Checked := FKeyBindings.ShiftF3;
   cbxShiftF3.Visible := True;
@@ -192,7 +204,6 @@ begin
   chkFindDeclOnCaret.Checked := FKeyBindings.FindDeclOnCaret;
 
   cbxActiveClick(cbxActive);
-  cbxExtendedHomeClick(cbxExtendedHome);
 end;
 
 procedure TFrameOptionPageKeybindings.SaveData;
@@ -203,6 +214,7 @@ begin
   FKeyBindings.ExtendedHome := cbxExtendedHome.Checked;
   FKeyBindings.SwitchedExtendedHome := cbxSwitchExtendedHome.Checked;
   FKeyBindings.ExtendedCtrlLeftRight := cbxExtendedCtrlLeftRight.Checked;
+  FKeyBindings.ExtendedCtrlLeftRightStopAtSpace:= cbxExtendedCtrlLeftRightStopAtSpace.Checked;
   {$IF CompilerVersion <= 20.0}
   FKeyBindings.ShiftF3 := cbxShiftF3.Checked;
   {$IFEND}
@@ -245,6 +257,7 @@ begin
   IndentSingleLine := False;
   ExtendedHome := True;
   ExtendedCtrlLeftRight := False;
+  ExtendedCtrlLeftRightStopAtSpace := False;
   {$IF CompilerVersion <= 20.0}
   ShiftF3 := True;
   {$IFEND}
@@ -377,6 +390,16 @@ begin
         if not StepNext then
           Break;
     end;
+  end
+  else if ExtendedCtrlLeftRightStopAtSpace and (EditPosition.IsWhiteSpace) then
+  begin
+    Handled := True;
+    if StepNext then
+    begin
+      while (EditPosition.Column < EndCol) and EditPosition.IsWhiteSpace do
+        if not StepNext then
+          Break;
+    end;
   end;
 
   if not Handled then
@@ -406,9 +429,10 @@ begin
   end;
 
   { Skip whitespaces }
-  while (EditPosition.Column < EndCol) and EditPosition.IsWhiteSpace do
-    if not StepNext then
-      Break;
+  if not ExtendedCtrlLeftRightStopAtSpace then
+    while (EditPosition.Column < EndCol) and EditPosition.IsWhiteSpace do
+      if not StepNext then
+        Break;
 end;
 
 procedure TKeybindings.CtrlMoveCursor(EditBuffer: IOTAEditBuffer; View: IOTAEditView;

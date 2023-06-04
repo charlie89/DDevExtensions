@@ -1,10 +1,14 @@
 inherited FrameOptionPageKeybindings: TFrameOptionPageKeybindings
   Width = 317
-  Height = 266
+  Height = 297
   TabStop = True
+  ExplicitWidth = 317
+  ExplicitHeight = 297
   inherited pnlClient: TPanel
     Width = 317
-    Height = 217
+    Height = 248
+    ExplicitWidth = 317
+    ExplicitHeight = 217
     object cbxActive: TCheckBox
       Left = 8
       Top = 8
@@ -69,11 +73,11 @@ inherited FrameOptionPageKeybindings: TFrameOptionPageKeybindings
       Hint = 'Ctrl+Left/Right like in VisualStudio'
       Caption = 'Extended Ctrl+Left/Right'
       TabOrder = 5
-      OnClick = cbxTabIndentClick
+      OnClick = cbxExtendedCtrlLeftRightClick
     end
     object cbxShiftF3: TCheckBox
       Left = 24
-      Top = 192
+      Top = 215
       Width = 174
       Height = 17
       Hint = 
@@ -87,7 +91,7 @@ inherited FrameOptionPageKeybindings: TFrameOptionPageKeybindings
     end
     object chkMoveLineBlock: TCheckBox
       Left = 24
-      Top = 146
+      Top = 169
       Width = 241
       Height = 17
       Hint = 'Alt+Up/Down move the current line or selected block up/down.'
@@ -98,7 +102,7 @@ inherited FrameOptionPageKeybindings: TFrameOptionPageKeybindings
     end
     object chkFindDeclOnCaret: TCheckBox
       Left = 24
-      Top = 169
+      Top = 192
       Width = 241
       Height = 17
       Hint = 
@@ -109,15 +113,27 @@ inherited FrameOptionPageKeybindings: TFrameOptionPageKeybindings
       ShowHint = True
       TabOrder = 7
     end
+    object cbxExtendedCtrlLeftRightStopAtSpace: TCheckBox
+      Left = 40
+      Top = 146
+      Width = 225
+      Height = 17
+      Hint = 'Ctrl+Left/Right also stops when a whitespace block begins'
+      Caption = 'Stop on start of a whitespace block'
+      TabOrder = 9
+    end
   end
   inherited pnlDescription: TPanel
     Width = 317
+    ExplicitWidth = 317
     inherited bvlSplitter: TBevel
       Width = 317
+      ExplicitWidth = 317
     end
     inherited lblDescription: TLabel
-      Width = 182
+      Width = 201
       Caption = 'Configure the enhanced key bindings.'
+      ExplicitWidth = 201
     end
   end
 end
